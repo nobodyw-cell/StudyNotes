@@ -57,6 +57,53 @@
    2. 一个视图模板
 2. SpringMVC
    1. 编写一个控制器处理对根路径的请求(将请求转发至主页视图)
+   ```java
+   @Controller /相当于bean
+    public class HomeController {
+    
+    @GetMapping("/")  //如果有针对"/"发起GET请求那么他会响应
+    public String home() {
+        return "home"; // 这个值会被解析为视图的逻辑名(当然也可以直接作为json返回忘了怎么做了)
+    }
+    }
+   ```
    2. 写一个视图模板
+      1. 为什么用thymeleaf 容易与springboot进行配合
+      2. 模板名由逻辑视图名派生而来
+      3. 代码
+    ```html
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:th="http://www.thymleaf.org">
+    <head>
+        <title>Taco</title>
+    </head>
+    <body>
+        <h1>欢迎来到Taco home</h1>
+        <img th:src="@{/images/taco.png}"/>
+    </body>
+    </html>
+    ```
+    3. 构建和运行应用
+   直接运行引导类就行了
+   ### 1.3.1 了解spring boot devTools
 
-怎样用servlet写一个文件下载
+   1. 应用自动重启 
+      1. src/main下的内容发生变化后会重启应用
+      2. 不会对依赖项进行检测依赖项
+   2. 浏览器自动刷新,禁用模板缓存
+   3. 内置h2控制台
+
+    ### 回顾   
+    不用写web.xml了?哈哈哈哈哈哈哈哈
+## 1.4 俯瞰spring风景线
+
+1. spring核心框架
+   1. 核心框架是spring领域中的基础,他提供了核心容器,以及依赖注入框架.
+   2. springmvc spring的web框架
+2. springboot
+3. springData
+4. springSecurity
+5. springCloud
+
+# 第二章 开发Web应用
