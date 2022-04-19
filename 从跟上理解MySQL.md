@@ -87,7 +87,7 @@ eddd计划就是一天看一章
       2. 不允许加 --前缀
       3. 每行只能指定一个选项
       4. =号周围可以有空白字符
-      5. # 表示注释
+      5. #表示注释
    3. 例子
    ```shell
    [server]
@@ -130,3 +130,82 @@ show  [GLOBAL|SESSION] variables [like 匹配的模式] (默认是SESSIOn)
 用来显示系统状态 比如说 Threads-connexteds
 
 SHOW [GLOBAL|SESSION] STATUES [LIKE 匹配模式]
+
+# 3.字符集和比较规则
+
+## 1. 字符集
+
+1. 重要字符集
+   1. ASCII(标准) 共收录128个字符
+   2. ISO 8859-1 ASCII的扩充,表示了258个字符,也叫啦体内
+   3. GB2312
+      1. 收录汉字6763个,其他文字682个,同时兼容ASCII
+      2. 若在ASCII字符集中就采用一字节,否则采用二字节
+      3. 也就是说他采用了一种变长编码方式
+   4. GBK 对GB2312做了扩充,兼容GB2312
+   5. utf8
+      1. 收录地球上所有字符
+      2. 采用变长编码方式,编码一个字符需要使用1 ~ 4个字符
+2. MySQL支持的字符集和排序规则
+   1. 字符集
+      1. utf8mb3 也就是utf8 采用三个字节编码
+      2. utf8mb4 采用四个字节编码(如果想要存个emoji表情的话可以用这个)
+      3. 字符集查看 show character set
+
+## 2. 字符集和比较规则的应用
+
+1. 服务器级别
+   1. 两个系统变量
+      1. 字符集 character_set_server
+      2. 比较规则 collation_server 
+   2. 可以查看这两个系统变量的值
+   3. 可以在配置文件,启动选项,服务器程序运行过程使用SET改变这两个变量的值.
+2. 数据库级别
+   1. 创建或修改数据库的时候指定
+   2. 查看character_set_database,collation_database
+3. 表级别
+4. 列级别
+```SQL
+CREATE TABLE 表名(
+    列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称],
+    其他列...
+);
+
+ALTER TABLE 表名 MODIFY 列名 字符串类型 [CHARACTER SET 字符集名称] [COLLATE 比较规则名称];
+```
+
+## 3. 客户端和服务器通信中的字符集
+
+1. MySQL中字符集的转换
+
+|系统变量|描述|
+|--|--|
+|character_set_client	|服务器解码请求时使用的字符集|
+|character_set_connection	|服务器处理请求时会把请求字符串从character_set_client转为character_set_connection|
+|character_set_results	|服务器向客户端返回数据时使用的字符集|
+
+主要就是玩这几个变量
+
+如果某个列使用的字符集和character_set_connection代表的字符集不一致的话，还需要进行一次字符集转换。
+
+character_set_connection只是服务器在将请求的字节串从character_set_client转换为character_set_connection时使用，它是什么其实没多重要，但是一定要注意，该字符集包含的字符范围一定涵盖请求中的字符，要不然会导致有的字符无法使用character_set_connection代表的字符集进行编码。比如你把character_set_client设置为utf8，把character_set_connection设置成ascii，那么此时你如果从客户端发送一个汉字到服务器，那么服务器无法使用ascii字符集来编码这个汉字，就会向用户发出一个警告。
+
+SET NAMES 字符集名; 将三个字符集同时设置 
+
+
+https://github.com/checkstyle/checkstyle/wiki/Checkstyle-GSoC-2022-Project-Ideas#project-name-optimization-of-distance-between-methods-in-single-jav
+
+二叉查找树 左子节点小于父节点,右子子节点大于父节点, 根据插入数据的顺序不同,树的形态也会有所变化,所以有时候不是那么快捷
+
+平衡二叉树 平衡二叉树通常会保证树的左右两边的节点层级相差不会大于2
+1. 非叶子节点最多拥有两个子节点
+2. 非叶子节点的值大于左节点小于右键点
+3. 左右两边层级数相差不会大于1
+4. 没有值相等重复的点
+
+B树
+也叫多路平衡查找树
+1. 所有节点按递增次序排列,并遵循左小右大
+2. 子节点数非叶子节点的子节点数>1,且小于M,且M>2
+3. 枝节点的关键字数量大于等于ceil(m/2)-1个且小于等于M-1个（注：ceil()是个朝正无穷方向取整的函数 如ceil(1.1)结果为2)
+4. ）所有叶子节点均在同一层、叶子节点除了包含了关键字和关键字记录的指针外也有指向其子节点的指针只不过其指针地址都为null对应下图最后一层节点的空格子;
